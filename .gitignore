@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# linting
+.pylintrc
+
+# draft/notes
+/draft
+
+# vscode
+.vscode
