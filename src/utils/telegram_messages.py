@@ -10,7 +10,7 @@ from telebot import types
 # set parent directory
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
-sys.path.append(f'{parent}/utils')
+sys.path.append(f"{parent}/utils")
 
 import constants
 
@@ -18,7 +18,7 @@ def generate_welcome_message(user_data):
     ''' generate welcome text and buttons for language choice '''
     lang = user_data.language_code
     user_name = user_data.first_name
-    text = f'{constants.GREET[lang]}, {user_name}!\n{constants.ASK_LANG[lang]}'
+    text = f"{constants.GREET[lang]}, {user_name}!\n{constants.ASK_LANG[lang]}"
 
     btnArmenian = types.InlineKeyboardButton(
         text= '🇦🇲 ' + constants.BTN_ARMENIAN,
@@ -35,30 +35,9 @@ def generate_welcome_message(user_data):
 
     return [text, markup]
 
-def generate_ask_address_message(lang):
-    ''' generate message to ask for address '''
-    text = constants.ASK_ADDRESS[lang]
-
-    btnShareLocation = types.InlineKeyboardButton(
-        text=constants.BTN_LOCATION[lang],
-        request_location=True,
-        callback_data = 'address' + '_' + constants.BTN_LOCATION[lang])
-    btnInputManually = types.InlineKeyboardButton(
-        text=constants.BTN_MANUAL[lang],
-        callback_data = 'address' + '_' + constants.BTN_MANUAL[lang])
-
-    markup = types.InlineKeyboardMarkup(
-        ).add(btnShareLocation, btnInputManually)
-
-    return [text, markup]
-
 def generate_share_location_message(lang):
     ''' generate message to ask to share location '''
     return constants.ASK_SHARE_LOCATION[lang]
-
-def generate_input_address_message(lang):
-    ''' generate message to ask to input address '''
-    return constants.ASK_INPUT_ADDRESS[lang]
 
 def generate_ask_more_addresses(lang):
     ''' generate message to ask for more addresses or finish the setup '''

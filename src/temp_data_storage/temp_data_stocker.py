@@ -19,6 +19,7 @@ class TempDataStocker:
             'user_id': message.from_user.id,
             'chat_id': message.chat.id,
             'is_group': message.chat.type == 'supergroup',
+            'lang': message.from_user.language_code,
         }
 
     def create_data_file(self, message):
@@ -46,14 +47,21 @@ class TempDataStocker:
         data = json.load(open(file_path, 'r', encoding='utf-8'))
         return data['lang'] if 'lang' in data else '' # maybe default language?
 
-    def update_address(self, message, address):
+    def update_address(self, message):
         ''' updates user's address in temp json file '''
         file_path = self.generate_data_filename(message.chat.type, message.chat.id)
         data = json.load(open(file_path, 'r', encoding='utf-8'))
+
+        location = {
+            "longitude": message.location.longitude,
+            "latitude": message.location.latitude,
+        }
+
         if not 'address' in data:
             data['address'] = []
 
-        data['address'].append(address)
+        data['address'].append(location)
+
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file)
             file.close()

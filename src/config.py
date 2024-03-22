@@ -6,4 +6,4 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # constant variables
-BOT_TOKEN = os.environ.get('TG_BOT_TOKEN')
+BOT_TOKEN = os.environ.get("TG_BOT_TOKEN")
