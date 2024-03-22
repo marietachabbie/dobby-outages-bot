@@ -136,3 +136,6 @@ dmypy.json
 
 # vscode
 .vscode
+
+# temp json data files
+/src/temp_data_storage/data/*.json

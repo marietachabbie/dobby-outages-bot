@@ -11,8 +11,8 @@ from telebot import TeleBot
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-sys.path.append(f'{parent}/utils')
-sys.path.append(f'{parent}/temp_data_stocker')
+sys.path.append(f"{parent}/utils")
+sys.path.append(f"{parent}/temp_data_stocker")
 
 import constants
 import telegram_messages
@@ -28,13 +28,13 @@ data_stocker = temp_data_stocker.TempDataStocker()
 # global commands
 @bot.message_handler(commands=[constants.HELP])
 def send_help(message):
-    ''' temp docstring '''
-    bot.send_message(message.chat.id, '*** Here to help you! ***')
+    ''' [should] show all commands and description '''
+    bot.send_message(message.chat.id, "*** Here to help you! ***")
 
 @bot.message_handler(commands=[constants.SETTINGS])
 def send_settings(message):
-    ''' temp docstring '''
-    bot.send_message(message.chat.id, '*** Here comes your settings ***')
+    ''' [should] redirect to settings '''
+    bot.send_message(message.chat.id, "*** Here comes your settings ***")
 
 @bot.message_handler(commands=[constants.START])
 def send_welcome(message):
@@ -52,9 +52,9 @@ def handle_callback_queries(callback_query):
         case 'lang':
             store_language_and_ask_address(data[1], callback_query.message)
         case 'address':
-            ask_to_share_or_input_address(data[1], callback_query.message)
+            ask_to_share_location(data[1], callback_query.message)
         case 'more':
-            ask_for_address(lang, callback_query.message)
+            ask_to_share_location(lang, callback_query.message)
         case 'done':
             # TODO: store data from temp json to DB
             # TODO: rm temp json file
@@ -65,7 +65,6 @@ def handle_callback_queries(callback_query):
 @bot.message_handler(content_types=[constants.LOCATION])
 def handle_location(message):
     ''' TODO: store user's location '''
-    # message.location: {'longitude': 44.494431, 'latitude': 40.216256, ...}
 
     data_stocker.update_address(message)
     lang = data_stocker.read_language(message)
@@ -73,13 +72,9 @@ def handle_location(message):
 
 @bot.message_handler(content_types=[constants.TEXT])
 def handle_text_input(message):
-    ''' temp docstring '''
+    ''' handle text inputs '''
     lang = data_stocker.read_language(message)
-    if message.text.lower().startswith(constants.ADDRESS[lang]):
-        # TODO: store user's location
-        ask_more_addresses_or_finish(message, lang)
-    else:
-        handle_unknown_input(message, lang)
+    handle_unknown_input(message, lang)
 
 def ask_more_addresses_or_finish(message, lang):
     ''' ask if user wishes to add more addresses or not '''
@@ -98,26 +93,14 @@ def store_language_and_ask_address(lang, message):
     lang_code = constants.LANGUAGE_CODES[lang]
     data_stocker.update_language(message, lang_code)
 
-    ask_for_address(lang_code, message)
+    ask_to_share_location(lang_code, message)
 
-def ask_for_address(lang, message):
-    ''' aks if user wishes to share location or input manually '''
-    text, markup = telegram_messages.generate_ask_address_message(lang)
-    bot.edit_message_text(text, message.chat.id, message.id, reply_markup=markup)
-
-def ask_to_share_or_input_address(btn_choice, message):
-    ''' ask user to either share location or input address '''
-    lang = data_stocker.read_language(message)
-    if btn_choice == constants.BTN_LOCATION[lang]:
-        bot.edit_message_text(
-            telegram_messages.generate_share_location_message(lang),
-            message.chat.id,
-            message.id)
-    elif btn_choice == constants.BTN_MANUAL[lang]:
-        bot.edit_message_text(
-            telegram_messages.generate_input_address_message(lang),
-            message.chat.id,
-            message.id)
+def ask_to_share_location(lang, message):
+    ''' ask user to share location '''
+    bot.edit_message_text(
+        telegram_messages.generate_share_location_message(lang),
+        message.chat.id,
+        message.id)
 
 def finish_conversation(lang, message):
     ''' finish the conversation '''
