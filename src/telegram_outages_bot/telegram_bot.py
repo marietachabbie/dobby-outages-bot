@@ -29,12 +29,12 @@ data_stocker = temp_data_stocker.TempDataStocker()
 @bot.message_handler(commands=[constants.HELP])
 def send_help(message):
     ''' [should] show all commands and description '''
-    bot.send_message(message.chat.id, "*** Here to help you! ***")
+    bot.send_message(message.from_user.id, "*** Here to help you! ***")
 
 @bot.message_handler(commands=[constants.SETTINGS])
 def send_settings(message):
     ''' [should] redirect to settings '''
-    bot.send_message(message.chat.id, "*** Here comes your settings ***")
+    bot.send_message(message.from_user.id, "*** Here comes your settings ***")
 
 @bot.message_handler(commands=[constants.START])
 def send_welcome(message):
@@ -42,7 +42,7 @@ def send_welcome(message):
     data_stocker.create_data_file(message)
 
     text, markup = telegram_messages.generate_welcome_message(message.from_user)
-    bot.send_message(message.chat.id, text, reply_markup=markup)
+    bot.send_message(message.from_user.id, text, reply_markup=markup)
 
 def handle_callback_queries(callback_query):
     ''' handle callback queries from inline buttons '''
@@ -79,11 +79,11 @@ def handle_text_input(message):
 def ask_more_addresses_or_finish(message, lang):
     ''' ask if user wishes to add more addresses or not '''
     text, markup = telegram_messages.generate_ask_more_addresses(lang)
-    bot.send_message(message.chat.id, text, reply_markup=markup)
+    bot.send_message(message.from_user.id, text, reply_markup=markup)
 
 def handle_unknown_input(message, lang):
     ''' handle all unknown inputs '''
-    bot.send_message(message.chat.id, constants.UNKNOWN[lang])
+    bot.send_message(message.from_user.id, constants.UNKNOWN[lang])
     # TODO: send help
 
 def store_language_and_ask_address(lang, message):
@@ -99,10 +99,10 @@ def ask_to_share_location(lang, message):
     ''' ask user to share location '''
     bot.edit_message_text(
         telegram_messages.generate_share_location_message(lang),
-        message.chat.id,
+        message.from_user.id,
         message.id)
 
 def finish_conversation(lang, message):
     ''' finish the conversation '''
     text = telegram_messages.generate_finish_message(lang)
-    bot.send_message(message.chat.id, text)
+    bot.send_message(message.from_user.id, text)
