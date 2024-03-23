@@ -8,23 +8,21 @@ import json
 class TempDataStocker:
     ''' stores temporary data '''
 
-    def generate_data_filename(self, chat_type, chat_id):
+    def generate_data_filename(self, user_id):
         ''' generates temp json filename for a user '''
         current_dir = os.path.dirname(os.path.realpath(__file__))
-        return f'{current_dir}/data/{chat_type}_{chat_id}_data.json'
+        return f'{current_dir}/data/{user_id}_data.json'
 
     def generate_chat_data(self, message):
         ''' generates chat/user data '''
         return {
-            'user_id': message.from_user.id,
-            'chat_id': message.chat.id,
-            'is_group': message.chat.type == 'supergroup',
-            'lang': message.from_user.language_code,
+            'tg_user_id': message.from_user.id,
+            'lang_code': message.from_user.language_code,
         }
 
     def create_data_file(self, message):
         ''' creates temporary json file '''
-        file_path = self.generate_data_filename(message.chat.type, message.chat.id)
+        file_path = self.generate_data_filename(message.from_user.id)
         data = self.generate_chat_data(message)
         with open(file_path, 'w+', encoding='utf-8') as file:
             json.dump(data, file)
@@ -32,9 +30,9 @@ class TempDataStocker:
 
     def update_language(self, message, lang):
         ''' updates language user has chosen '''
-        file_path = self.generate_data_filename(message.chat.type, message.chat.id)
+        file_path = self.generate_data_filename(message.from_user.id)
         data = json.load(open(file_path, 'r', encoding='utf-8'))
-        data['lang'] = lang
+        data['lang_code'] = lang
 
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file)
@@ -43,13 +41,13 @@ class TempDataStocker:
 
     def read_language(self, message):
         ''' reads user's chosen language from json file '''
-        file_path = self.generate_data_filename(message.chat.type, message.chat.id)
+        file_path = self.generate_data_filename(message.from_user.id)
         data = json.load(open(file_path, 'r', encoding='utf-8'))
-        return data['lang'] if 'lang' in data else '' # maybe default language?
+        return data['lang_code'] if 'lang_code' in data else '' # maybe default language?
 
     def update_address(self, message):
         ''' updates user's address in temp json file '''
-        file_path = self.generate_data_filename(message.chat.type, message.chat.id)
+        file_path = self.generate_data_filename(message.from_user.id)
         data = json.load(open(file_path, 'r', encoding='utf-8'))
 
         location = {
