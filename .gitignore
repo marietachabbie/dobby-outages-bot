@@ -139,3 +139,6 @@ dmypy.json
 
 # temp json data files
 /src/temp_data_storage/data/*.json
+
+# database manager local testing
+/src/database/__main__.py

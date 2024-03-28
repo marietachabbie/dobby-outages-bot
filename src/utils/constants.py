@@ -27,8 +27,8 @@ BTN_LOCATION = {
 
 BTN_ANOTHER_ADDRESS = {
     "hy": "եւս մեկ հասցե",
-    "en": "another address",
-    "ru": "другой адрес",
+    "en": "one more address",
+    "ru": "еще один адрес",
 }
 
 BTN_DONE = {
@@ -58,12 +58,6 @@ ASK_MORE_ADDRESSES = {
     "hy": "Ցանկանու՞մ եք ավելացնել նոր հասցե, թե՞ այսքանը բավական է",
     "en": "Wish to add a new address or that\"s enough?",
     "ru": "Хотите добавить новый адрес или этого достаточно?",
-}
-
-ADDRESS = {
-    "hy": "հասցե",
-    "en": "address",
-    "ru": "адрес",
 }
 
 UNKNOWN = {
