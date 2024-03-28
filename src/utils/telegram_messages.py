@@ -1,7 +1,7 @@
 ''' This module exports functions to generate tg-bot messages '''
 
 # disable wrong-import-position warning
-# pylint: disable = C0413
+# pylint: disable = C0413, C0411
 
 import os
 import sys
