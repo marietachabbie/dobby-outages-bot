@@ -1,7 +1,7 @@
 ''' This module exports telegram bot message handlers'''
 
 # disable wrong-import-position warning
-# pylint: disable = C0413
+# pylint: disable = C0413, C0411
 
 import os
 import sys
@@ -14,10 +14,11 @@ sys.path.append(parent)
 sys.path.append(f"{parent}/utils")
 sys.path.append(f"{parent}/temp_data_stocker")
 
+import config
 import constants
 import telegram_messages
 from temp_data_storage import temp_data_stocker
-import config
+from database import database_manager
 
 # initialize telegram bot
 bot = TeleBot(config.BOT_TOKEN)
@@ -29,23 +30,25 @@ data_stocker = temp_data_stocker.TempDataStocker()
 @bot.message_handler(commands=[constants.HELP])
 def send_help(message):
     ''' [should] show all commands and description '''
-    bot.send_message(message.from_user.id, "*** Here to help you! ***")
+    bot.send_message(message.chat.id, "*** Here to help you! ***")
 
 @bot.message_handler(commands=[constants.SETTINGS])
 def send_settings(message):
     ''' [should] redirect to settings '''
-    bot.send_message(message.from_user.id, "*** Here comes your settings ***")
+    bot.send_message(message.chat.id, "*** Here comes your settings ***")
 
 @bot.message_handler(commands=[constants.START])
 def send_welcome(message):
     ''' greet user and ask for preferred language '''
+    # TODO: delete data from db to create new raw ?
     data_stocker.create_data_file(message)
 
     text, markup = telegram_messages.generate_welcome_message(message.from_user)
-    bot.send_message(message.from_user.id, text, reply_markup=markup)
+    bot.send_message(message.chat.id, text, reply_markup=markup)
 
 def handle_callback_queries(callback_query):
     ''' handle callback queries from inline buttons '''
+    # TODO: ask and update user's preferred name
     data = callback_query.data.split('_')
     lang = data_stocker.read_language(callback_query.message)
     match data[0]:
@@ -56,8 +59,7 @@ def handle_callback_queries(callback_query):
         case 'more':
             ask_to_share_location(lang, callback_query.message)
         case 'done':
-            # TODO: store data from temp json to DB
-            # TODO: rm temp json file
+            register_user_in_db(callback_query.message.chat.id)
             finish_conversation(lang, callback_query.message)
 
 @bot.callback_query_handler(handle_callback_queries)
@@ -76,14 +78,22 @@ def handle_text_input(message):
     lang = data_stocker.read_language(message)
     handle_unknown_input(message, lang)
 
+def register_user_in_db(user_id):
+    ''' registers user in db and deletes temp json file '''
+    user_data = data_stocker.read_user_data(user_id)
+    db_manager = database_manager.DatabaseManager()
+    db_manager.insert_one(user_data)
+    db_manager.disconnect()
+    data_stocker.delete_data_file(user_id)
+
 def ask_more_addresses_or_finish(message, lang):
     ''' ask if user wishes to add more addresses or not '''
     text, markup = telegram_messages.generate_ask_more_addresses(lang)
-    bot.send_message(message.from_user.id, text, reply_markup=markup)
+    bot.send_message(message.chat.id, text, reply_markup=markup)
 
 def handle_unknown_input(message, lang):
     ''' handle all unknown inputs '''
-    bot.send_message(message.from_user.id, constants.UNKNOWN[lang])
+    bot.send_message(message.chat.id, constants.UNKNOWN[lang])
     # TODO: send help
 
 def store_language_and_ask_address(lang, message):
@@ -99,10 +109,11 @@ def ask_to_share_location(lang, message):
     ''' ask user to share location '''
     bot.edit_message_text(
         telegram_messages.generate_share_location_message(lang),
-        message.from_user.id,
+        message.chat.id,
         message.id)
 
 def finish_conversation(lang, message):
     ''' finish the conversation '''
     text = telegram_messages.generate_finish_message(lang)
-    bot.send_message(message.from_user.id, text)
+    # TODO: Remove previous menu
+    bot.send_message(message.chat.id, text)
